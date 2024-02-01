@@ -1,0 +1,7 @@
+*.bkp
+*.pyc
+client/keys.py
+lambda/suds/
+lambda/suds-1.1.2.dist-info/
+server/.vscode/settings.json
+server/db/dbinit
