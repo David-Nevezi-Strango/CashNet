@@ -13,6 +13,7 @@ Transaction::Transaction(json js)
 }
 
 json Transaction::toJson() {
+    //helper function to put object into json
     return json{{"transaction_id", this->transaction_id},
                 {"account_id", this->account_id},
                 {"dest_account_id", this->dest_account_id},
@@ -23,7 +24,9 @@ json Transaction::toJson() {
 }
 
 bool Transaction::insertIntoDatabase(sqlite3* db) {
+    //function to create new account in DB
     if (!checkIfOpen(db, this->account_id)){
+        //if account exists with this ID, do not insert again
         return false;
     }
 
@@ -52,6 +55,7 @@ bool Transaction::insertIntoDatabase(sqlite3* db) {
 }
 
 bool Transaction::checkIfOpen(sqlite3* db, int account_id) {
+    //helper function to check if an account is open or closed
     std::string query = "SELECT COUNT(transaction_id) FROM transactions WHERE account_id = ? and transaction_type = 1";
     sqlite3_stmt* stmt;
     
@@ -84,6 +88,7 @@ bool Transaction::checkIfOpen(sqlite3* db, int account_id) {
 }
 
 json Transaction::getAllClosedAccountsID(sqlite3* db) {
+    //get the ID of all closed accounts
     std::vector<int> transactions;
     std::string query = "SELECT account_id FROM transactions WHERE transaction_type = 1";
     sqlite3_stmt* statement;
@@ -110,6 +115,7 @@ json Transaction::getAllClosedAccountsID(sqlite3* db) {
 }
 
 json Transaction::getAllTransactionByAccountID(sqlite3* db, int account_id) {
+    //get all transactions of an account by account_id
     std::vector<Transaction> transactions;
     std::string sql = "SELECT transaction_id, dest_account_id, customer_id, sum, transaction_type, date FROM transactions WHERE account_id = ?;";
     sqlite3_stmt* statement;
@@ -142,6 +148,7 @@ json Transaction::getAllTransactionByAccountID(sqlite3* db, int account_id) {
 }
 
 json Transaction::getAllTransactionByCustomerID(sqlite3* db, int customer_id) {
+    //get all transactions of a customer by customer_id
     std::vector<Transaction> transactions;
     std::string sql = "SELECT transaction_id, account_id, dest_account_id, sum, transaction_type, date FROM transactions WHERE customer_id = ?;";
     sqlite3_stmt* statement;

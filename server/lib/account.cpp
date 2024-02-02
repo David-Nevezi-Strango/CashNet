@@ -9,6 +9,7 @@ Account::Account(json js)
 }
 
 json Account::toJson() {
+    //helper function to put object into json
     return json{{"account_id", this->account_id},
                 {"customer_id", this->customer_id},
                 {"current_sum", this->current_sum},
@@ -16,6 +17,7 @@ json Account::toJson() {
 }
 
 bool Account::insertIntoDatabase(sqlite3* db) {
+    //function to insert object into DB
     std::string sql = "INSERT INTO accounts (account_id, customer_id, current_sum, currency) VALUES (?, ?, ?, ?);";
         sqlite3_stmt* statement;
 
@@ -37,10 +39,12 @@ bool Account::insertIntoDatabase(sqlite3* db) {
         return false;
 }
 bool Account::updateAccount(sqlite3* db, int account_id, double sum){
+    //function to update sum on the account
     std::string sql = "UPDATE accounts SET current_sum = current_sum + ? WHERE account_id = ?;";
     sqlite3_stmt* statement;
     
     if(Transaction::checkIfOpen(db, account_id)){
+        //if account was not closed, update
         if (sqlite3_prepare_v2(db, sql.c_str(), -1, &statement, nullptr) == SQLITE_OK) {
             sqlite3_bind_double(statement, 1, sum);
             sqlite3_bind_int(statement, 2, account_id);
@@ -59,43 +63,46 @@ bool Account::updateAccount(sqlite3* db, int account_id, double sum){
 
 
 json Account::getAllAccounts(sqlite3* db) {
-        std::vector<Account> accounts;
-        std::string sql = "SELECT account_id, customer_id , current_sum, currency FROM accounts;";
-        sqlite3_stmt* statement;
-    
-        if (sqlite3_prepare_v2(db, sql.c_str(), -1, &statement, nullptr) == SQLITE_OK) {
-            
-            while (sqlite3_step(statement) == SQLITE_ROW) {
-                int account_id = sqlite3_column_int(statement, 0);
-                int customer_id = sqlite3_column_int(statement, 1);
-                double current_sum = sqlite3_column_double(statement, 2);
-                const unsigned char* currency = sqlite3_column_text(statement, 3);
-                if(Transaction::checkIfOpen(db, account_id)){
-                    accounts.emplace_back(account_id, customer_id, current_sum, reinterpret_cast<const char*>(currency));
-                }
-            }
+    //function to get all accounts
+    std::vector<Account> accounts;
+    std::string sql = "SELECT account_id, customer_id , current_sum, currency FROM accounts;";
+    sqlite3_stmt* statement;
 
-            sqlite3_finalize(statement);
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &statement, nullptr) == SQLITE_OK) {
+        
+        while (sqlite3_step(statement) == SQLITE_ROW) {
+            int account_id = sqlite3_column_int(statement, 0);
+            int customer_id = sqlite3_column_int(statement, 1);
+            double current_sum = sqlite3_column_double(statement, 2);
+            const unsigned char* currency = sqlite3_column_text(statement, 3);
+            if(Transaction::checkIfOpen(db, account_id)){
+                //if account was not closed, add it to the list
+                accounts.emplace_back(account_id, customer_id, current_sum, reinterpret_cast<const char*>(currency));
+            }
         }
 
-        json jsonArray;
-
-        for (auto &element : accounts) {
-            json accountJson = element.toJson();
-            jsonArray.push_back(accountJson);
-        }  
-        json result;
-        result["response"] = jsonArray;
-        return result;
+        sqlite3_finalize(statement);
     }
 
-json Account::getAccountByID(sqlite3* db, int account_id){
+    json jsonArray;
 
+    for (auto &element : accounts) {
+        json accountJson = element.toJson();
+        jsonArray.push_back(accountJson);
+    }  
+    json result;
+    result["response"] = jsonArray;
+    return result;
+}
+
+json Account::getAccountByID(sqlite3* db, int account_id){
+    //function to get an account by it's ID
     std::string sql = "SELECT customer_id, current_sum, currency FROM accounts WHERE account_id = ?;";
     sqlite3_stmt* statement;
     json result;
 
     if(Transaction::checkIfOpen(db, account_id)){
+        //if account was not closed, get it
         if (sqlite3_prepare_v2(db, sql.c_str(), -1, &statement, nullptr) == SQLITE_OK) {
             sqlite3_bind_int(statement, 1, account_id);
             if (sqlite3_step(statement) == SQLITE_ROW) {
@@ -112,6 +119,7 @@ json Account::getAccountByID(sqlite3* db, int account_id){
 }
 
 json Account::getLastAccountID(sqlite3* db){
+    // function to increment account ID
     std::string sql = "SELECT MAX(account_id) FROM accounts;";
     sqlite3_stmt* statement;
     int account_id = 0;
@@ -130,6 +138,7 @@ json Account::getLastAccountID(sqlite3* db){
 }
 
 json Account::getAllAccountsByCustomerID(sqlite3* db, int customer_id){
+    //get a customer's accounts
     std::vector<Account> accounts;
     std::string sql = "SELECT account_id, customer_id , current_sum, currency FROM accounts WHERE customer_id = ?;";
     sqlite3_stmt* statement;
@@ -143,6 +152,7 @@ json Account::getAllAccountsByCustomerID(sqlite3* db, int customer_id){
             double current_sum = sqlite3_column_double(statement, 2);
             const unsigned char* currency = sqlite3_column_text(statement, 3);
             if(Transaction::checkIfOpen(db, account_id)){
+                //if account was not closed, add it to the list
                 accounts.emplace_back(account_id, customer_id, current_sum, reinterpret_cast<const char*>(currency));
             }
 

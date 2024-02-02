@@ -1,4 +1,5 @@
 from utils import console, communicate, createSocket, sha_256, CLEAR_CMD, API_URL, DIGIT_REGEX
+#API_KEY is a string containing the key for the exchangerate API
 from keys import API_KEY
 import getpass
 import os
@@ -8,6 +9,7 @@ import requests
 customer = {}
 
 def createAccount():
+    #function to create a new account
     global customer
     os.system(CLEAR_CMD)
     createText="""
@@ -15,11 +17,13 @@ def createAccount():
         Please type the international abreviation for it(or press ENTER to return)
             """
     currency = input(createText)
+    #if enter was pressed, exit from this function
     if currency == "":
         return
     else:
         while currency != "":
             found = False
+            #check if an account already exists with the specified currency
             if customer["accounts"]:
                 for account in customer["accounts"]:
                     if account["currency"] == currency.upper():
@@ -34,6 +38,7 @@ def createAccount():
                 #     currency = input(
                 #         "\tSorry, but you have typed in an invalid currency!\n\tPlease select other currencies or type press ENTER to return\n\t\t")
                 #     continue
+                #check if the currency was typed in correctly
                 currCheckJson = {
                     "currency" : currency
                 }
@@ -44,7 +49,7 @@ def createAccount():
                     currency = input(
                         "\tSorry, but you have typed in an invalid currency!\n\tPlease select other currencies or type press ENTER to return\n\t\t")
                     continue
-
+                #create the account  
                 requestJson = {
                     "customer_id" : customer["id"],
                     "call" : "getAccountID"
@@ -72,6 +77,7 @@ def createAccount():
                     print("\t\tCreation failed!")
 
 def closeAccount():
+    #function to close an existing account
     global customer
     os.system(CLEAR_CMD)
     accountIdx = accountSelection()
@@ -93,6 +99,7 @@ def closeAccount():
         input()
 
 def accountSelection():
+    #helper function to select an account from a list
     global customer
     accountText = """
         Please select the account (the number followed by #):
@@ -104,8 +111,15 @@ def accountSelection():
     for account in customer["accounts"]:
         accounts_str += "Account #" + str(account_nr) + ": ID:  " + str(account["account_id"]) + " - " + str(account["current_sum"]) + " " + account["currency"] + "\n\t"
         account_nr += 1
-    return console(accountText.format(accounts=accounts_str), len(customer["accounts"])) - 1
+    keyboard_input = console(accountText.format(accounts=accounts_str), len(customer["accounts"]))
+    #exception handling
+    #if enter was pressed, exit from this function
+    if keyboard_input == "":
+        return
+    return keyboard_input - 1
+
 def withdraw(transactionFlag = False):
+    #function to withdraw or transfer a sum from an account
     global customer
     os.system(CLEAR_CMD)
     accountIdx = accountSelection()
@@ -114,36 +128,47 @@ def withdraw(transactionFlag = False):
     \t"""
     print(withdrawText.format(transaction_type="withdrawn" if not transactionFlag else "transferred"))
     sum = input("\t\tSum: ")
+    #if enter was pressed, exit from this function
     if sum == "":
         return
     # print("isdigit: ", sum.isdigit())
+    #exception handling
     if sum != "" and DIGIT_REGEX.match(sum):
         sum = float(sum.replace(",","."))
         while sum < 0 or customer["accounts"][accountIdx]["current_sum"] - sum < 0:
             sum = input("\t\tInsufficient funds! Please type in a smaller sum(or press ENTER to return):")
+            #if enter was pressed, exit from this function
             if sum == "":
                 return
             # if sum == "":
             #     sum = 9999999999999999
+            #exception handling
             elif sum != "" and DIGIT_REGEX.match(sum):
                 sum = float(sum.replace(",","."))
         else:
             if transactionFlag:
+                #if it is a transaction, calculate the exchange rate 
                 dest_account = input("\t\tPlease type in the destination account's ID: ")
+                #if enter was pressed, exit from this function
+                if dest_account == "":
+                    return
+                #exception handling
                 if dest_account != "" and  DIGIT_REGEX.match(dest_account):
                     dest_account = int(dest_account)
                     if dest_account ==  customer["accounts"][accountIdx]["account_id"]:
                         print("\t\t{transaction_type} failed because of destination account (It is the same as the source account)! Press ENTER to return".format(transaction_type="Withdraw" if not transactionFlag else "Transfer"))
                         input()
                         return
+                #get destination account's currency
                 destCurrencyRequest = {"customer_id" : customer["id"],"call" : "getAccountByID", "account_id": dest_account}
                 destCurrencyResponse = communicate("request", destCurrencyRequest)
-                src_currency = customer["accounts"][accountIdx]["currency"]
                 if not destCurrencyResponse:
                     print("\t\t{transaction_type} failed because of destination account (It might be closed)! Press ENTER to return".format(transaction_type="Withdraw" if not transactionFlag else "Transfer"))
                     input()
                     return
+                src_currency = customer["accounts"][accountIdx]["currency"]
                 dest_currrency = destCurrencyResponse["response"]["currency"]
+                #calculate exchange rate
                 if src_currency == dest_currrency:
                     exchangeRate = 1
                 else:
@@ -153,6 +178,7 @@ def withdraw(transactionFlag = False):
                     print("\t\tThe exchange rate being used is the following: {rate}\n".format(rate=round(exchangeRate, 2)))
                 converted_sum = round(sum * exchangeRate, 2)
             else:
+                #if it is a withdraw, put dummy data
                 dest_account = -1
                 converted_sum = None
 
@@ -174,6 +200,7 @@ def withdraw(transactionFlag = False):
                 print("\t\t{transaction_type} failed! Press ENTER to return".format(transaction_type="Withdraw" if not transactionFlag else "Transfer"))
                 input()
 def deposit():
+    #function to deposit into an account
     global customer
     os.system(CLEAR_CMD)
     accountIdx = accountSelection()
@@ -182,9 +209,11 @@ def deposit():
     \t"""
     print(depositText)
     sum = input("\tSum: ")
+    #if enter was pressed, exit from this function
     if sum == "":
         return
     else:
+        #exception handling
         if sum != "" and DIGIT_REGEX.match(sum):
             sum = float(sum.replace(",","."))
         else:
@@ -207,8 +236,10 @@ def deposit():
             else:
                 print("\t\tDeposit failed! Press ENTER to return or try a smaller sum")
                 sum = input("\tSum: ")
+                #if enter was pressed, exit from this function
                 if sum == "":
                     return
+                #exception handling
                 elif sum != "" and DIGIT_REGEX.match(sum):
                     sum = float(sum.replace(",","."))
 
@@ -217,6 +248,7 @@ def transaction():
     withdraw(True)
 
 def viewHistory():
+    #function to visualize transaction history of an account
     global customer
     os.system(CLEAR_CMD)
     accountIdx = accountSelection()
@@ -231,8 +263,10 @@ def viewHistory():
         "call" : "getAccountTransactions"
     }
     resp = communicate("request", requestJson)
+    #exception handling
     if type(resp) == dict and "result" in resp.keys():
         resp = resp["result"]
+    #prepare the string of the history
     transaction_str = ""
     for transaction in resp:
         transaction_type = transaction["transaction_type"]

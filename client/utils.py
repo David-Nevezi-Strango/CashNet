@@ -3,13 +3,16 @@ import json
 from copy import deepcopy
 import os
 import re
-CLEAR_CMD = "cls" if os.name == "nt" else "clear"
+
 serverAddressPort = ("127.0.0.1", 5500)
 bufferSize = 1024
 TCPSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
 API_URL = 'https://openexchangerates.org/api/latest.json?app_id={api_key}&symbols={curr}&prettyprint=false&show_alternative=false'
+CLEAR_CMD = "cls" if os.name == "nt" else "clear"
 DIGIT_REGEX = re.compile('\d+((\.|,)\d+)?')
+
 def createSocket(isAdmin=False):
+    #function to connect to the server and identify type of client
     identifier = "admin" if isAdmin else "client"
     try:
         TCPSocket.connect(serverAddressPort)
@@ -19,7 +22,7 @@ def createSocket(isAdmin=False):
     communicate(identifier)
 
 def console(text, range):
-    global customer
+    #function to get an index of possible range
     trial = input(text)
     if trial == "":
         return trial
@@ -29,19 +32,24 @@ def console(text, range):
         option = 0
     while(option < 1 or option > range):
         trial = input("\tInvalid number, please select from the options above!\n\t")
+        #if enter was pressed, exit from this function
         if trial == "":
             return trial
+        #exception handling
         elif trial != "" and DIGIT_REGEX.match(trial):
             option = int(trial)
     return option
 
 def communicate(primitive: str, json_param=None):
+    #function used for communication protocol
     global TCPSocket
     try:
+        #if it is a identifying communication
         if primitive in ["client", "admin", "exit"]:
             TCPSocket.send(primitive.encode())
             TCPSocket.recv(bufferSize)
         else:
+            #begin protocol
             json_str = json.dumps(json_param)
             TCPSocket.send(primitive.encode())
             respConfirmationPrimitive = TCPSocket.recv(bufferSize).decode()
@@ -55,7 +63,9 @@ def communicate(primitive: str, json_param=None):
             TCPSocket.send(json_str.encode())
             respSize = TCPSocket.recv(bufferSize).decode()
             # print("4 ",respSize)
+            #if confirmation was sent instead of bytesize, return with confirmation
             if not DIGIT_REGEX.match(respSize):
+                #exception handling
                 if "{" in respSize:
                     return json.loads(respSize)
                 else:
@@ -64,6 +74,7 @@ def communicate(primitive: str, json_param=None):
                 respSize = int(respSize)
             TCPSocket.send(str(respSize).encode())
             responseJson = ""
+            #get response JSON
             while respSize > 0:
                 responseJson += TCPSocket.recv(bufferSize).decode()
                 size = len(responseJson)

@@ -9,12 +9,14 @@ Customer::Customer(json js)
     : customer_id(0), customer_name(js["customer_name"]), customer_password(js["customer_password"]) {
 }
 json Customer::toJson() {
+    //helper function to put object into json
     return json{{"customer_id", this->customer_id},
                 {"customer_name", this->customer_name},
                 {"customer_password", this->customer_password}};
 }
 int Customer::insertIntoDatabase(sqlite3* db) {
     if(!Customer::checkName(db)){
+        //if customer does not exist, insert it into DB
         std::string sql = "INSERT INTO customers (customer_name, customer_password) VALUES (?, ?);";
         sqlite3_stmt* statement;
 
@@ -28,6 +30,7 @@ int Customer::insertIntoDatabase(sqlite3* db) {
             }
 
             sqlite3_finalize(statement);
+            //log new customer in to get it's ID
             json loginID = Customer::login(db, customer_name, customer_password);
             return loginID["id"];
         }
@@ -38,6 +41,7 @@ int Customer::insertIntoDatabase(sqlite3* db) {
 }
 
 bool Customer::checkName(sqlite3* db) {
+    //helper function to check if this object exists in DB
     std::string query = "SELECT COUNT(*) FROM customers WHERE customer_name = ?";
     sqlite3_stmt* stmt;
     
@@ -70,6 +74,7 @@ bool Customer::checkName(sqlite3* db) {
 }
 
 json Customer::login(sqlite3* db, std::string customer_name, std::string customer_password ){
+    //function to log customer in
     std::string sql = "SELECT customer_id FROM customers WHERE customer_name = ? AND customer_password = ?;";
     sqlite3_stmt* statement;
     json result;
@@ -93,6 +98,7 @@ json Customer::login(sqlite3* db, std::string customer_name, std::string custome
 }
 
 json Customer::getAllCustomer(sqlite3* db) {
+    //function to get all customers
     std::vector<Customer> customers;
     std::string sql = "SELECT customer_id, customer_name, customer_password FROM customers;";
     sqlite3_stmt* statement;
@@ -122,6 +128,7 @@ json Customer::getAllCustomer(sqlite3* db) {
 }
 
 bool Customer::deleteCustomerById(sqlite3* db, int customer_id){
+    //function to delete a customer
     std::string query = "DELETE FROM customers WHERE customer_customer_id = ?";
     sqlite3_stmt* statement;
 

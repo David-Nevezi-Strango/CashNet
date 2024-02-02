@@ -38,7 +38,7 @@ int main() {
     }
 
 
-    // Închiderea conexiunii cu baza de date
+    // Close DB
     sqlite3_close(db);
 
     return 0;
