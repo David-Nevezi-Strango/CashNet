@@ -324,8 +324,7 @@ void doProcessing (int connfd)
                 Customer customer(request);
                 customer.insertIntoDatabase(db); 
                 sprintf(sendBuff,"postCustomer done");
-                // printf("%s\n", sendBuff);
-                // send(connfd, sendBuff, strlen(sendBuff),0); 
+
             }else if(call.compare("postAccount") == 0){
                 Account account(request);
                 bool ok = account.insertIntoDatabase(db);
@@ -342,8 +341,7 @@ void doProcessing (int connfd)
                 }else{
                     sprintf(sendBuff,"postAccount failed");
                 }
-                // printf("%s\n", sendBuff); 
-                // send(connfd, sendBuff, strlen(sendBuff),0);  
+                
             }else if(call.compare("postTransaction") == 0){
                 Transaction transaction(request); 
                 bool ok = transaction.insertIntoDatabase(db);
@@ -366,8 +364,8 @@ void doProcessing (int connfd)
                         std::cout << "update close account failed!" << std::endl;
                         ok = rc;
                     }
-
                 }
+
                 // if transaction was a transfer
                 if (type == 4){
                     // Update account and add corresponding transaction log
@@ -388,62 +386,40 @@ void doProcessing (int connfd)
                 }else{
                     sprintf(sendBuff,"postTransaction failed");
                 }
-                // printf("%s\n", sendBuff);
-                // send(connfd, sendBuff, strlen(sendBuff),0);  
+                
             }else if(call.compare("getCustomers") == 0){
                 response = Customer::getAllCustomer(db);
-                // responseFile << customers;
-                // responseFile.close();
-                // sendFile(connfd, responseFilePath.c_str());
+                
             }else if(call.compare("getCustomerAccounts") == 0){
                 response = Account::getAllAccountsByCustomerID(db, request["customer_id"]);
-                // responseFile << accounts;
-                // responseFile.close();
-                // sendFile(connfd, responseFilePath.c_str());
+                
             }else if(call.compare("getAccountByID") == 0){
                 response = Account::getAccountByID(db, request["account_id"]);
-                // responseFile << accounts;
-                // responseFile.close();
-                // sendFile(connfd, responseFilePath.c_str());
+                
             }else if(call.compare("getAccounts") == 0){
                 response = Account::getAllAccounts(db);
-                // responseFile << accounts;
-                // responseFile.close();
-                // sendFile(connfd, responseFilePath.c_str());
+
             }else if(call.compare("getAccountID") == 0){
                 response = Account::getLastAccountID(db);
-                // responseFile << accountID;
-                // responseFile.close();
-                // sendFile(connfd, responseFilePath.c_str());
+                
             }else if(call.compare("getCustomerTransaction") == 0){
                 response = Transaction::getAllTransactionByCustomerID(db, request["customer_id"]);
-                // responseFile << transactions;
-                // responseFile.close();
-                // sendFile(connfd, responseFilePath.c_str());  
+                
             }else if(call.compare("getAccountTransactions") == 0){
                 response = Transaction::getAllTransactionByAccountID(db, request["account_id"]);
-                // responseFile << transactions;
-                // responseFile.close();
-                // sendFile(connfd, responseFilePath.c_str());
+                
             }else if(call.compare("loginCustomer") == 0){
                 std::cout <<"im in " << std::endl;
                 response = Customer::login(db, request["customer_name"], request["customer_password"]);
                 std::cout << "json response: " << response.dump(4) << std::endl;
-                // responseFile << response;
-                // responseFile.close();
-                // sendFile(connfd, responseFilePath.c_str());  
-                    //???
+                
             // }else if(call.compare("deleteCustomerById") == 0){
             //         bool response = Customer::deleteCustomerById(db, request["customer_id"]);
             //         if(response){
-            //         sprintf(sendBuff,"deleteCustomerById done");
-            //         printf("%s\n", sendBuff);
-            //         send(connfd, sendBuff, strlen(sendBuff),0);
+            //             sprintf(sendBuff,"deleteCustomerById done");
 
             //         }else{
-            //         sprintf(sendBuff,"deleteCustomerById fail");
-            //         printf("%s\n", sendBuff);
-            //         send(connfd, sendBuff, strlen(sendBuff),0); 
+            //             sprintf(sendBuff,"deleteCustomerById fail");
 
             //         } 
 
@@ -501,25 +477,13 @@ void doProcessing (int connfd)
                     }
                     // json result;
                     response["response"] = socketList;
-                    // responseFile << response;
-                    // std::string dump = socketList.dump();
-                    // sprintf(sendBuff,"%s", dump.c_str());
-                    // printf("%s\n", sendBuff);
-                    // send(connfd, sendBuff, strlen(sendBuff),0); 
 
                 // }else{
                 //     sprintf(sendBuff,"listsockets illegal request");
-                //     printf("%s\n", sendBuff);
-                //     send(connfd, sendBuff, strlen(sendBuff),0); 
                 }
 
             }
-        // }else if(strcmp(recvBuff, "file-send") == 0){   
-        //         sendFile(connfd, responseFilePath.c_str());  
-        
-        //}else if(strcmp(recvBuff, "kill "))
             //send response
-            // std::cout << " response bool: " <<(call.find("post") !=std::string::npos|| call == "kill") << std::endl;
             if(call.find("post") !=std::string::npos || call.compare("kill") == 0 ){
                 //these require only confirmation
 #ifdef DEBUG
@@ -558,18 +522,6 @@ void doProcessing (int connfd)
             pthread_mutex_lock(&sockets_mutex);
             isBusy[pthread_self()] = false;
             pthread_mutex_unlock(&sockets_mutex);
-            //break;
-    // }else /*if(strcmp(recvBuff,"test") == 0)*/{
-            /*Extract the number*/
-            //sscanf(recvBuff, "%d", &a); 
-            // a = atoi(recvBuff);
-            /*Multiply the answer by 10*/  
-            // result = a * 10; 
-            
-//                 snprintf(sendBuff, sizeof(sendBuff), "%d", result);shutdown(connfd, SHUT_RDWR);
-// close(connfd);   
-
-            // send(connfd, sendBuff, strlen(sendBuff),0); 
 
         }
             
