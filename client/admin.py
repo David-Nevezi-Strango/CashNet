@@ -9,7 +9,7 @@ def getSocketsList():
     }
     resp = communicate("request", requestJson)
     #exception handling
-    if type(resp) == dict and "result" in resp.keys():
+    if type(resp) == dict and "response" in resp.keys():
         resp = resp["response"]
     sockets_list = resp
     list_str = ""
@@ -121,7 +121,7 @@ def connectCustomerToAccount():
     requestAccountJson = {"call" : "getAccounts"}
     customers = communicate("request", requestCustomerJson)
     #exception handling
-    if type(customers) == dict and "result" in customers.keys():
+    if type(customers) == dict and "response" in customers.keys():
         customers = customers["response"]
     accounts = communicate("request", requestAccountJson)
     if type(accounts) == dict and "response" in accounts.keys():

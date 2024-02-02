@@ -81,6 +81,8 @@ def closeAccount():
     global customer
     os.system(CLEAR_CMD)
     accountIdx = accountSelection()
+    if accountIdx == "":
+        return
     requestJson = {
         "customer_id" : customer["id"],
         "call" : "postTransaction",
@@ -102,7 +104,7 @@ def accountSelection():
     #helper function to select an account from a list
     global customer
     accountText = """
-        Please select the account (the number followed by #):
+        Please select the account (the number followed by #) or press ENTER to return:
         
         {accounts}
     \t"""
@@ -115,7 +117,7 @@ def accountSelection():
     #exception handling
     #if enter was pressed, exit from this function
     if keyboard_input == "":
-        return
+        return keyboard_input
     return keyboard_input - 1
 
 def withdraw(transactionFlag = False):
@@ -123,6 +125,8 @@ def withdraw(transactionFlag = False):
     global customer
     os.system(CLEAR_CMD)
     accountIdx = accountSelection()
+    if accountIdx == "":
+        return
     withdrawText = """
         Please type in the amount of money to be {transaction_type} (or press ENTER to return):
     \t"""
@@ -204,6 +208,8 @@ def deposit():
     global customer
     os.system(CLEAR_CMD)
     accountIdx = accountSelection()
+    if accountIdx == "":
+        return
     depositText = """
         Please type in the amount of money to be deposited (or press ENTER to return):\n
     \t"""
@@ -252,6 +258,8 @@ def viewHistory():
     global customer
     os.system(CLEAR_CMD)
     accountIdx = accountSelection()
+    if accountIdx == "":
+        return
     historyText = """
         Here is your account's history (Press ENTER to return):
         
@@ -264,8 +272,8 @@ def viewHistory():
     }
     resp = communicate("request", requestJson)
     #exception handling
-    if type(resp) == dict and "result" in resp.keys():
-        resp = resp["result"]
+    if type(resp) == dict and "response" in resp.keys():
+        resp = resp["response"]
     #prepare the string of the history
     transaction_str = ""
     for transaction in resp:

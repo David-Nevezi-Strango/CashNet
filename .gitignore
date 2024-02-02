@@ -7,3 +7,4 @@ server/.vscode/settings.json
 server/db/dbinit
 server/test.cpp
 server/server
+server/requests/

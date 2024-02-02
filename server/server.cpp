@@ -34,7 +34,7 @@
 
 //using namespace std;
 using json = nlohmann::json;
-
+// #define DEBUG
 #define MAX_MSG_SIZE 1024
 #define THREADPOOL_SIZE 20
 
@@ -426,7 +426,9 @@ void doProcessing (int connfd)
                 // responseFile.close();
                 // sendFile(connfd, responseFilePath.c_str());
             }else if(call.compare("loginCustomer") == 0){
+                std::cout <<"im in " << std::endl;
                 response = Customer::login(db, request["customer_name"], request["customer_password"]);
+                std::cout << "json response: " << response.dump(4) << std::endl;
                 // responseFile << response;
                 // responseFile.close();
                 // sendFile(connfd, responseFilePath.c_str());  
@@ -500,9 +502,6 @@ void doProcessing (int connfd)
                     // json result;
                     response["response"] = socketList;
                     // responseFile << response;
-#ifdef DEBUG 
-                    std::cout << "json response: " << result.dump(4) << std::endl;
-#endif
                     // std::string dump = socketList.dump();
                     // sprintf(sendBuff,"%s", dump.c_str());
                     // printf("%s\n", sendBuff);
@@ -520,15 +519,19 @@ void doProcessing (int connfd)
         
         //}else if(strcmp(recvBuff, "kill "))
             //send response
-            if(call.find("post") || call.compare("kill")){
+            // std::cout << " response bool: " <<(call.find("post") !=std::string::npos|| call == "kill") << std::endl;
+            if(call.find("post") !=std::string::npos || call.compare("kill") == 0 ){
                 //these require only confirmation
 #ifdef DEBUG
-                printf("%s\n", sendBuff);
+                printf("sendbuff: %s\n", sendBuff);
 #endif
                 send(connfd, sendBuff, strlen(sendBuff),0); 
 
-            }else if(call.find("get") || call.compare("listsockets") || call.compare("loginCustomer")){
+            }else if(call.find("get") !=std::string::npos || call.compare("listsockets") == 0 || call.compare("loginCustomer") == 0){
                 //these require a response JSON
+#ifdef DEBUG 
+                std::cout << "json response: " << response.dump(4) << std::endl;
+#endif
                 responseFile << response;
                 responseFile.close();
                 sendFile(connfd, responseFilePath.c_str());  

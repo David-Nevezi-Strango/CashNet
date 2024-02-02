@@ -109,7 +109,7 @@ json Transaction::getAllClosedAccountsID(sqlite3* db) {
     //     jsonArray.push_back(transactionJson);
     // }  
     json result;
-    result["result"] = transactions;
+    result["response"] = transactions;
 
     return result;
 }
@@ -142,7 +142,7 @@ json Transaction::getAllTransactionByAccountID(sqlite3* db, int account_id) {
         jsonArray.push_back(transactionJson);
     }  
     json result;
-    result["result"] = jsonArray;
+    result["response"] = jsonArray;
 
     return result;
 }
