@@ -19,7 +19,7 @@ int main() {
         return 1;
     }
 
-     createTableSQL = "CREATE TABLE IF NOT EXISTS accounts (account_id INTEGER NOT NULL, customer_id INTEGER NOT NULL, current_sum REAL NOT NULL, currency TEXT NOT NULL, FOREIGN KEY (customer_id) REFERENCES customers(customer_id), PRIMARY KEY (account_id, customer_id));";
+    createTableSQL = "CREATE TABLE IF NOT EXISTS accounts (account_id INTEGER PRIMARY KEY AUTOINCREMENT, current_sum REAL NOT NULL, currency TEXT NOT NULL);";
     
     result = sqlite3_exec(db, createTableSQL.c_str(), nullptr, nullptr, &errorMsg);
     if (result != SQLITE_OK) {
@@ -28,7 +28,16 @@ int main() {
         return 1;
     }
 
-     createTableSQL = "CREATE TABLE IF NOT EXISTS transactions (transaction_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, account_id INTEGER NOT NULL, dest_account_id INTEGER NOT NULL, customer_id INTEGER NOT NULL, sum REAL NOT NULL, transaction_type INTEGER NOT NULL, date TEXT NOT NULL, FOREIGN KEY(customer_id) REFERENCES customers(customer_id), FOREIGN KEY(account_id) REFERENCES accounts(account_id));";
+    createTableSQL = "CREATE TABLE IF NOT EXISTS transactions (transaction_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, account_id INTEGER NOT NULL, dest_account_id INTEGER NOT NULL, customer_id INTEGER NOT NULL, sum REAL NOT NULL, transaction_type INTEGER NOT NULL, date TEXT NOT NULL, FOREIGN KEY(customer_id) REFERENCES customers(customer_id), FOREIGN KEY(account_id) REFERENCES accounts(account_id));";
+    
+    result = sqlite3_exec(db, createTableSQL.c_str(), nullptr, nullptr, &errorMsg);
+    if (result != SQLITE_OK) {
+        std::cout << "Error on table creation: " << errorMsg << std::endl;
+        sqlite3_free(errorMsg);
+        return 1;
+    }
+
+    createTableSQL = "CREATE TABLE IF NOT EXISTS account_connections (account_id INTEGER NOT NULL, customer_id INTEGER NOT NULL, FOREIGN KEY(customer_id) REFERENCES customers(customer_id), FOREIGN KEY(account_id) REFERENCES accounts(account_id), PRIMARY KEY (account_id, customer_id));";
     
     result = sqlite3_exec(db, createTableSQL.c_str(), nullptr, nullptr, &errorMsg);
     if (result != SQLITE_OK) {

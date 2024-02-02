@@ -145,7 +145,7 @@ def connectCustomerToAccount():
     #create str that will be output to the client console
     if accounts:
         for account in accounts:
-            accounts_str += "\t\tAccount ID: " + str(account["account_id"]) + "Currency: " + account["currency"] + "\n"
+            accounts_str += "\t\tAccount ID: " + str(account["account_id"]) + " Currency: " + account["currency"] + "\n"
     else:
         accounts_str = "None"
     accountID = console(accountText.format(account_list=accounts_str), len(accounts))
@@ -158,13 +158,10 @@ def connectCustomerToAccount():
     if type(response) == dict and "response" in response.keys():
         response = response["response"]
     if response:
-        requestConnection = {"call" : "postAccount",
+        requestConnection = {"call" : "postAccountConnection",
                              "account_id" : accountID,
                              "customer_id" : customers[customerIdx]["customer_id"],
-                             "currency" : response["currency"],
-                             "connection" : True,
-                             "date" : datetime.datetime.now().strftime('%Y %b %d %H:%M:%S %Z%z'),
-                             "current_sum" : response["current_sum"]}
+                             "connection" : True}
         resp = communicate("request", requestConnection)
         if "done" in resp:
             print("\t\tCreation successful! Press ENTER to go back")

@@ -43,38 +43,39 @@ def createAccount():
                     "currency" : currency
                 }
                 responseJSON = requests.post("https://92egg0rcuj.execute-api.eu-north-1.amazonaws.com/test/checkCurrency", json=currCheckJson).json()
-                print(responseJSON)
                 responseBool = responseJSON["body"]
                 if not responseBool:
                     currency = input(
                         "\tSorry, but you have typed in an invalid currency!\n\tPlease select other currencies or type press ENTER to return\n\t\t")
                     continue
                 #create the account  
-                requestJson = {
-                    "customer_id" : customer["id"],
-                    "call" : "getAccountID"
-                }
-                resp = communicate("request", requestJson)
+                # requestJson = {
+                #     "customer_id" : customer["id"],
+                #     "call" : "getAccountID"
+                # }
+                # resp = communicate("request", requestJson)
                 requestJson = {
                     "call" : "postAccount",
-                    "account_id" : resp["response"],
+                    # "account_id" : resp["response"],
                     "customer_id" : customer["id"],
                     "current_sum" : 0.0,
                     "currency" : currency.upper(),
-                    "connection" : False,
+                    # "connection" : False,
                     "date" : datetime.datetime.now().strftime('%Y %b %d %H:%M:%S %Z%z')
                 }
                 resp = communicate("request", requestJson)
                 if "done" in resp:
-                    if customer["accounts"]:
-                        customer["accounts"].append({"account_id" : requestJson["account_id"], "current_sum" : 0.0, "currency" : currency.upper()})
-                    else:
-                        customer["accounts"] = list({"account_id": requestJson["account_id"], "current_sum": 0.0, "currency": currency.upper()})
+                    # if customer["accounts"]:
+                    #     customer["accounts"].append({"account_id" : requestJson["account_id"], "current_sum" : 0.0, "currency" : currency.upper()})
+                    # else:
+                    #     customer["accounts"] = list({"account_id": requestJson["account_id"], "current_sum": 0.0, "currency": currency.upper()})
                     print("\tCreation successful! Press ENTER to return")
                     input()
                     break
                 else:
-                    print("\t\tCreation failed!")
+                    print("\t\tCreation failed! Press ENTER to return")
+                    input()
+                    break
 
 def closeAccount():
     #function to close an existing account
@@ -365,6 +366,7 @@ def logout():
 def login():
     global customer
     global TCPSocket
+    os.system(CLEAR_CMD)
     loginText = """
         Please log in!
         

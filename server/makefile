@@ -8,6 +8,7 @@ dependency:
 # ./lib/sqlite3/configure
 # cd lib/sqlite3/
 # make
-
+database:
+	g++ -o db/dbinit db/dbinit.cpp -std=c++11 -lsqlite3
 server: server.cpp addresses.h
 	g++ -o server server.cpp -std=c++11 -Ilib lib/transaction.cpp lib/customer.cpp lib/account.cpp  -lsqlite3 -lpthread

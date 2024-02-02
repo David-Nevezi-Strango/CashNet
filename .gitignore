@@ -8,3 +8,4 @@ server/db/dbinit
 server/test.cpp
 server/server
 server/requests/
+*.drawio

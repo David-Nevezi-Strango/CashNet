@@ -322,20 +322,39 @@ void doProcessing (int connfd)
             // Process the request
             if(call.compare("postCustomer") == 0){
                 Customer customer(request);
-                customer.insertIntoDatabase(db); 
-                sprintf(sendBuff,"postCustomer done");
+                bool ok = customer.insertIntoDatabase(db); 
+                if (ok){
+                    sprintf(sendBuff,"postCustomer done");
+                }else{
+                    sprintf(sendBuff,"postCustomer failed");
+                }
+            }else if(call.compare("postAccountConnection") == 0){
+                bool ok = Account::postAccountConnection(db, request["account_id"], request["customer_id"]);
+                if (ok){
+                    sprintf(sendBuff,"postCustomer done");
+                }else{
+                    sprintf(sendBuff,"postCustomer failed");
+                }
 
             }else if(call.compare("postAccount") == 0){
+                bool ok;
                 Account account(request);
-                bool ok = account.insertIntoDatabase(db);
-                bool isConnection = request["connection"];
-                if (isConnection){
-                    Transaction transaction(request["account_id"], -1, request["customer_id"], 0.0, 0, request["date"]);
-                    bool rc = transaction.insertIntoDatabase(db);  
-                    if(!rc){
-                        ok = rc;
-                    }
+                int account_id = account.insertIntoDatabase(db); 
+                bool rc;
+                std::cout << "account_id: " << account_id << std::endl;
+                if (account_id > -1){
+                    ok = Account::postAccountConnection(db, account_id, request["customer_id"]);
+                    Transaction transaction(account_id, -1, request["customer_id"], request["current_sum"], 0, request["date"]);
+                    rc = transaction.insertIntoDatabase(db);   
+                    std::cout << "rc: " << rc << std::endl;
+                } else {
+                    rc = false;
                 }
+                if(!rc){
+                    ok = rc;
+                }
+                
+                std::cout << "ok: " << ok << std::endl;
                 if (ok){
                     sprintf(sendBuff,"postAccount done");
                 }else{
@@ -399,8 +418,8 @@ void doProcessing (int connfd)
             }else if(call.compare("getAccounts") == 0){
                 response = Account::getAllAccounts(db);
 
-            }else if(call.compare("getAccountID") == 0){
-                response = Account::getLastAccountID(db);
+            // }else if(call.compare("getAccountID") == 0){
+            //     response = Account::getLastAccountID(db);
                 
             }else if(call.compare("getCustomerTransaction") == 0){
                 response = Transaction::getAllTransactionByCustomerID(db, request["customer_id"]);
