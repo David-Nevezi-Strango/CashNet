@@ -16,7 +16,7 @@ def createAccount():
         What currency would you like to have the account in? 
         Please type the international abreviation for it(or press ENTER to return)
             """
-    currency = input(createText)
+    currency = input(createText).strip()
     #if enter was pressed, exit from this function
     if currency == "":
         return
@@ -30,7 +30,7 @@ def createAccount():
                         found = True
                         break
             if found:
-                currency = input("\tSorry, but you cannot have multiple accounts of the same currency!\n\tPlease select other currencies or press ENTER to return\n\t\t")
+                currency = input("\tSorry, but you cannot have multiple accounts of the same currency!\n\tPlease select other currencies or press ENTER to return\n\t\t").strip()
             else:
                 # currChecker = Client('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL', cache=None)
                 # responseStr = currChecker.service.CurrencyName(currency[:2].upper())
@@ -49,26 +49,15 @@ def createAccount():
                         "\tSorry, but you have typed in an invalid currency!\n\tPlease select other currencies or type press ENTER to return\n\t\t")
                     continue
                 #create the account  
-                # requestJson = {
-                #     "customer_id" : customer["id"],
-                #     "call" : "getAccountID"
-                # }
-                # resp = communicate("request", requestJson)
                 requestJson = {
                     "call" : "postAccount",
-                    # "account_id" : resp["response"],
                     "customer_id" : customer["id"],
                     "current_sum" : 0.0,
                     "currency" : currency.upper(),
-                    # "connection" : False,
                     "date" : datetime.datetime.now().strftime('%Y %b %d %H:%M:%S %Z%z')
                 }
                 resp = communicate("request", requestJson)
                 if "done" in resp:
-                    # if customer["accounts"]:
-                    #     customer["accounts"].append({"account_id" : requestJson["account_id"], "current_sum" : 0.0, "currency" : currency.upper()})
-                    # else:
-                    #     customer["accounts"] = list({"account_id": requestJson["account_id"], "current_sum": 0.0, "currency": currency.upper()})
                     print("\tCreation successful! Press ENTER to return")
                     input()
                     break
@@ -83,6 +72,10 @@ def closeAccount():
     os.system(CLEAR_CMD)
     accountIdx = accountSelection()
     if accountIdx == "":
+        return
+    if customer["accounts"][accountIdx]["current_sum"] != 0:
+        print("\tSorry, but you cannot close an account if you have a deposited sum. Please withdraw it before closure\n\tPress ENTER to return\n\t\t")
+        input()
         return
     requestJson = {
         "customer_id" : customer["id"],
@@ -105,7 +98,7 @@ def accountSelection():
     #helper function to select an account from a list
     global customer
     accountText = """
-        Please select the account (the number followed by #) or press ENTER to return:
+        Please select the account (the number after #) or press ENTER to return:
         
         {accounts}
     \t"""
@@ -132,33 +125,30 @@ def withdraw(transactionFlag = False):
         Please type in the amount of money to be {transaction_type} (or press ENTER to return):
     \t"""
     print(withdrawText.format(transaction_type="withdrawn" if not transactionFlag else "transferred"))
-    sum = input("\t\tSum: ")
+    sum = input("\t\tSum: ").strip()
     #if enter was pressed, exit from this function
     if sum == "":
         return
-    # print("isdigit: ", sum.isdigit())
     #exception handling
     if sum != "" and DIGIT_REGEX.match(sum):
         sum = float(sum.replace(",","."))
         while sum < 0 or customer["accounts"][accountIdx]["current_sum"] - sum < 0:
-            sum = input("\t\tInsufficient funds! Please type in a smaller sum(or press ENTER to return):")
+            sum = input("\t\tInsufficient funds! Please type in a smaller sum(or press ENTER to return):").strip()
             #if enter was pressed, exit from this function
             if sum == "":
                 return
-            # if sum == "":
-            #     sum = 9999999999999999
             #exception handling
             elif sum != "" and DIGIT_REGEX.match(sum):
                 sum = float(sum.replace(",","."))
         else:
             if transactionFlag:
                 #if it is a transaction, calculate the exchange rate 
-                dest_account = input("\t\tPlease type in the destination account's ID: ")
+                dest_account = input("\t\tPlease type in the destination account's ID: ").strip()
                 #if enter was pressed, exit from this function
                 if dest_account == "":
                     return
                 #exception handling
-                if dest_account != "" and  DIGIT_REGEX.match(dest_account):
+                if dest_account != "" and DIGIT_REGEX.match(dest_account):
                     dest_account = int(dest_account)
                     if dest_account ==  customer["accounts"][accountIdx]["account_id"]:
                         print("\t\t{transaction_type} failed because of destination account (It is the same as the source account)! Press ENTER to return".format(transaction_type="Withdraw" if not transactionFlag else "Transfer"))
@@ -204,6 +194,10 @@ def withdraw(transactionFlag = False):
             else:
                 print("\t\t{transaction_type} failed! Press ENTER to return".format(transaction_type="Withdraw" if not transactionFlag else "Transfer"))
                 input()
+    else:
+        print("\tInvalid sum! Please re-try with a valid sum (press ENTER to return)")                
+        input()
+
 def deposit():
     #function to deposit into an account
     global customer
@@ -215,40 +209,37 @@ def deposit():
         Please type in the amount of money to be deposited (or press ENTER to return):\n
     \t"""
     print(depositText)
-    sum = input("\tSum: ")
-    #if enter was pressed, exit from this function
-    if sum == "":
-        return
-    else:
+    sum = -1
+    while sum < 0 or customer["accounts"][accountIdx]["current_sum"] - sum < 0:
+        sum = input("\tSum: ").strip()
+        #if enter was pressed, exit from this function
+        if sum == "":
+            return
         #exception handling
         if sum != "" and DIGIT_REGEX.match(sum):
             sum = float(sum.replace(",","."))
         else:
-            sum = 0
-        while sum < 0 or customer["accounts"][accountIdx]["current_sum"] - sum < 0:
-            requestJson = {
-                "customer_id" : customer["id"],
-                "call" : "postTransaction",
-                "account_id" : customer["accounts"][accountIdx]["account_id"],
-                "transaction_type" : 3,
-                "dest_account_id" : -1,
-                "date" : datetime.datetime.now().strftime('%Y %b %d %H:%M:%S %Z%z'),
-                "sum" : sum
-            }
-            resp = communicate("request", requestJson)
-            if "done" in resp:
-                print("\t\tDeposit successful! Press ENTER to return")
-                input()
-                return
-            else:
-                print("\t\tDeposit failed! Press ENTER to return or try a smaller sum")
-                sum = input("\tSum: ")
-                #if enter was pressed, exit from this function
-                if sum == "":
-                    return
-                #exception handling
-                elif sum != "" and DIGIT_REGEX.match(sum):
-                    sum = float(sum.replace(",","."))
+            sum = -1
+            print("\tInvalid sum! Please type in a valid sum (or press ENTER to return)")
+    else:
+        requestJson = {
+            "customer_id" : customer["id"],
+            "call" : "postTransaction",
+            "account_id" : customer["accounts"][accountIdx]["account_id"],
+            "transaction_type" : 3,
+            "dest_account_id" : -1,
+            "date" : datetime.datetime.now().strftime('%Y %b %d %H:%M:%S %Z%z'),
+            "sum" : sum
+        }
+        resp = communicate("request", requestJson)
+        if "done" in resp:
+            print("\t\tDeposit successful! Press ENTER to return")
+            input()
+            return
+        else:
+            print("\t\tDeposit failed! Press ENTER to return")
+            input()
+            return
 
 
 def transaction():
@@ -302,9 +293,7 @@ def viewHistory():
             transaction_str += "; Destination account ID: " + str(transaction["dest_account_id"])
         transaction_str += "\n"
     print(historyText.format(transactions=transaction_str))
-    option = input()
-    # while option != "b":
-    #     option = input("Wrong button! Please try again!")
+    input()
 
 def mainMenu():
     global customer
@@ -377,8 +366,8 @@ def login():
 
     ok = False
     while not ok:
-        name = input(loginText)
-        password = getpass.getpass(passwordText)
+        name = input(loginText).strip()
+        password = getpass.getpass(passwordText).strip()
         passwordEncrypted = sha_256(password)
         requestJson = {
         "customer_id": -1,
@@ -388,7 +377,6 @@ def login():
         resp = communicate("request", requestJson)
         if resp["id"] != -1:
             customer["customer_name"] = name
-            # customer["customer_password"] = passwordEncrypted
             customer["id"] = resp["id"]
             ok = True
         else:

@@ -9,3 +9,4 @@ server/test.cpp
 server/server
 server/requests/
 *.drawio
+.idea/

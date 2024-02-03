@@ -30,9 +30,9 @@ def listAll():
         {list}
     \t"""
 
-    option = input(listText.format(list=getSocketsList()[0]))
+    option = input(listText.format(list=getSocketsList()[0])).strip()
     while option != "":
-        trial = input("\t\tYou have typed in an invalid character, please try again!\n\t")
+        trial = input("\t\tYou have typed in an invalid character, please try again!\n\t").strip()
         option = trial
 
 def killSocket():
@@ -47,7 +47,7 @@ def killSocket():
     \t"""
     list_str, sockets_list = getSocketsList()
     #print the list of connection
-    trial = input(listText.format(list=list_str))
+    trial = input(listText.format(list=list_str)).strip()
     option = -1
     while option != "":
         #if enter was pressed, exit from this function
@@ -58,7 +58,7 @@ def killSocket():
         elif trial != "" and DIGIT_REGEX.match(trial):
             option = int(trial)
         else:
-            trial = input("\t\tYou have typed in an invalid option, please try again!\n\t")
+            trial = input("\t\tYou have typed in an invalid option, please try again!\n\t").strip()
             continue
         found = False
         thread_id = None
@@ -93,11 +93,11 @@ def createCustomer():
     passwordText = "\t\tPlease type in the customer's password(or press ENTER to go back): "
     option = None
     while option != "":
-        name = input(nameText)
+        name = input(nameText).strip()
         #if enter was pressed, exit from this function
         if name == "":
             return
-        password = input(passwordText)
+        password = input(passwordText).strip()
         if password == "":
             return
         requestJson = {
@@ -160,8 +160,7 @@ def connectCustomerToAccount():
     if response:
         requestConnection = {"call" : "postAccountConnection",
                              "account_id" : accountID,
-                             "customer_id" : customers[customerIdx]["customer_id"],
-                             "connection" : True}
+                             "customer_id" : customers[customerIdx]["customer_id"]}
         resp = communicate("request", requestConnection)
         if "done" in resp:
             print("\t\tCreation successful! Press ENTER to go back")

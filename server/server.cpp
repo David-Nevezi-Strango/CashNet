@@ -341,12 +341,10 @@ void doProcessing (int connfd)
                 Account account(request);
                 int account_id = account.insertIntoDatabase(db); 
                 bool rc;
-                std::cout << "account_id: " << account_id << std::endl;
                 if (account_id > -1){
                     ok = Account::postAccountConnection(db, account_id, request["customer_id"]);
                     Transaction transaction(account_id, -1, request["customer_id"], request["current_sum"], 0, request["date"]);
                     rc = transaction.insertIntoDatabase(db);   
-                    std::cout << "rc: " << rc << std::endl;
                 } else {
                     rc = false;
                 }
@@ -354,7 +352,6 @@ void doProcessing (int connfd)
                     ok = rc;
                 }
                 
-                std::cout << "ok: " << ok << std::endl;
                 if (ok){
                     sprintf(sendBuff,"postAccount done");
                 }else{
@@ -417,9 +414,6 @@ void doProcessing (int connfd)
                 
             }else if(call.compare("getAccounts") == 0){
                 response = Account::getAllAccounts(db);
-
-            // }else if(call.compare("getAccountID") == 0){
-            //     response = Account::getLastAccountID(db);
                 
             }else if(call.compare("getCustomerTransaction") == 0){
                 response = Transaction::getAllTransactionByCustomerID(db, request["customer_id"]);
@@ -428,19 +422,7 @@ void doProcessing (int connfd)
                 response = Transaction::getAllTransactionByAccountID(db, request["account_id"]);
                 
             }else if(call.compare("loginCustomer") == 0){
-                std::cout <<"im in " << std::endl;
                 response = Customer::login(db, request["customer_name"], request["customer_password"]);
-                std::cout << "json response: " << response.dump(4) << std::endl;
-                
-            // }else if(call.compare("deleteCustomerById") == 0){
-            //         bool response = Customer::deleteCustomerById(db, request["customer_id"]);
-            //         if(response){
-            //             sprintf(sendBuff,"deleteCustomerById done");
-
-            //         }else{
-            //             sprintf(sendBuff,"deleteCustomerById fail");
-
-            //         } 
 
             }else if(call.compare("kill") == 0){
             

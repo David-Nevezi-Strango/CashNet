@@ -30,14 +30,11 @@ public:
     static bool postAccountConnection(sqlite3* db, int account_id, int customer_id);
 
     static json getAccountByID(sqlite3* db, int account_id);
-
-    // static int getLastAccountID(sqlite3* db, int customer_id);
     
     static json getAllAccounts(sqlite3* db);
 
     static json getAllAccountsByCustomerID(sqlite3* db, int customer_id);
 
-    // static bool deleteAccountById(sqlite3* db, int customer_id);
 };
 
 #endif

@@ -9,7 +9,7 @@ bufferSize = 1024
 TCPSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
 API_URL = 'https://openexchangerates.org/api/latest.json?app_id={api_key}&symbols={curr}&prettyprint=false&show_alternative=false'
 CLEAR_CMD = "cls" if os.name == "nt" else "clear"
-DIGIT_REGEX = re.compile('\d+((\.|,)\d+)?')
+DIGIT_REGEX = re.compile('(-|\+)?\d+((\.|,)\d*)?')
 
 def createSocket(isAdmin=False):
     #function to connect to the server and identify type of client
@@ -23,7 +23,7 @@ def createSocket(isAdmin=False):
 
 def console(text, range):
     #function to get an index of possible range
-    trial = input(text)
+    trial = input(text).strip()
     if trial == "":
         return trial
     elif trial != "" and DIGIT_REGEX.match(trial):
@@ -31,7 +31,7 @@ def console(text, range):
     else:
         option = 0
     while(option < 1 or option > range):
-        trial = input("\tInvalid number, please select from the options above!\n\t")
+        trial = input("\tInvalid number, please select from the options above!\n\t").strip()
         #if enter was pressed, exit from this function
         if trial == "":
             return trial

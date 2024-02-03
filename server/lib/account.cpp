@@ -30,14 +30,9 @@ int Account::insertIntoDatabase(sqlite3* db) {
 
         if (sqlite3_step(statement) == SQLITE_ROW) {
             account_id = sqlite3_column_int(statement, 0);
-            // if(!Account::postAccountConnection(account_id, customer_id)) {
-            //     std::cout << "Failed Account Insert!" << std::endl;
-            //     return false;
-            // }   
         }
 
         sqlite3_finalize(statement);
-        // return true;
     }
 
     return account_id;
@@ -143,24 +138,6 @@ json Account::getAccountByID(sqlite3* db, int account_id){
     return result;
 }
 
-// int Account::getLastAccountID(sqlite3* db, int customer_id){
-//     // function to increment account ID
-//     std::string sql = "SELECT MAX(accounts.account_id) FROM accounts INNER JOIN account_connections ON accounts.account_id = account_connections.account_id WHERE account_connections.customer_id = ?;";
-//     sqlite3_stmt* statement;
-//     int account_id = -1;
-//     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &statement, nullptr) == SQLITE_OK) {
-//         sqlite3_bind_int(statement, 1, customer_id);
-
-//         if (sqlite3_step(statement) == SQLITE_ROW) {
-//             account_id = sqlite3_column_int(statement, 0);
-//         }
-
-//         sqlite3_finalize(statement);
-//     }
-
-//     return account_id;
-// }
-
 json Account::getAllAccountsByCustomerID(sqlite3* db, int customer_id){
     //get a customer's accounts
     std::vector<Account> accounts;
@@ -195,21 +172,3 @@ json Account::getAllAccountsByCustomerID(sqlite3* db, int customer_id){
     result["response"] = jsonArray;
     return result;
 }
-
-
-// bool Customer::deleteAccountById(sqlite3* db, int account_id){
-//     std::string query = "DELETE FROM accounts WHERE account_id = ?";
-//     sqlite3_stmt* statement;
-
-
-//     if (sqlite3_prepare_v2(db, query.c_str(), -1, &statement, nullptr) == SQLITE_OK) {
-//         sqlite3_bind_int(statement, 1, account_id);
-//         if (sqlite3_step(statement) != SQLITE_DONE) {
-//             return false;
-//         }
-
-//         sqlite3_finalize(statement);
-//         return true;
-//     }
-//     return false;
-// }
