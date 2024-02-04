@@ -1,7 +1,7 @@
 # CashNet. Simple Internet Banking app made for any platform
 
 ## How to install and run
-To install the dependencies, enter into server and client folders and run `sudo make dependency`.
+To install the dependencies, enter into server and client folders and run `sudo make dependency` in the command prompt or terminal.
 Then build the server using the command `make server`.
 Both applications can be started using the CLI (open a command prompt or terminal within the project folder). (`./server` for the server, `python3 client.py` for the client app and `python3 admin.py` for the admin app)
 
