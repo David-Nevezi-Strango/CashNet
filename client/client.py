@@ -32,7 +32,7 @@ def createAccount():
             else:
                 # check if the currency was typed in correctly
                 currChecker = Client('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL', cache=None)
-                responseStr = currChecker.service.CurrencyName(currency[:2].upper())
+                responseStr = currChecker.service.CurrencyName(currency[:3].upper())
                 if "not found" in responseStr.lower():
                     currency = input(
                         "\tSorry, but you have typed in an invalid currency!\n\tPlease select other currencies or type press ENTER to return\n\t\t")
