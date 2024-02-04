@@ -12,3 +12,4 @@ server/requests/
 .idea/
 lambda.zip
 lambda/keys.py
+client/test.py
