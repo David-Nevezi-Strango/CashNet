@@ -3,7 +3,7 @@
 ## How to install and run
 To install the dependencies, enter into server and client folders and run `sudo make dependency`.
 Then build the server using the command `make server`.
-Both applications can be started using the CLI.
+Both applications can be started using the CLI. (`./server` for the server, `python3 client.py` for the client app and `python3 admin.py` for the admin app)
 
 ## Usage
 - First, start the admin app, select the option of creating a new customer account, enter the credentials.
