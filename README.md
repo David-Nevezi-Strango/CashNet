@@ -12,4 +12,4 @@ Both applications can be started using the CLI (open a command prompt or termina
 - The admin app may also check all connected clients and may disconnect them. He may also connect a customer to another banking account so that it would become a shared one.
 
 ## Credits
-Special thanks to Lohmann Niels for his C++ JSON library (https://github.com/nlohmann/json)
+Special thanks to Lohmann Niels for his C++ JSON library (https://github.com/nlohmann/json) and to Guppster for his Threadpool-Queue server implementation
