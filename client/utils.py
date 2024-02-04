@@ -7,7 +7,6 @@ import re
 serverAddressPort = ("127.0.0.1", 5500)
 bufferSize = 1024
 TCPSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
-API_URL = 'https://openexchangerates.org/api/latest.json?app_id={api_key}&symbols={curr}&prettyprint=false&show_alternative=false'
 CLEAR_CMD = "cls" if os.name == "nt" else "clear"
 DIGIT_REGEX = re.compile('(-|\+)?\d+((\.|,)\d*)?')
 

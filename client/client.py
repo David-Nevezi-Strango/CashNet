@@ -1,6 +1,4 @@
-from utils import console, communicate, createSocket, sha_256, CLEAR_CMD, API_URL, DIGIT_REGEX
-#API_KEY is a string containing the key for the exchangerate API
-from keys import API_KEY
+from utils import console, communicate, createSocket, sha_256, CLEAR_CMD, DIGIT_REGEX
 import getpass
 import os
 import datetime
@@ -32,22 +30,22 @@ def createAccount():
             if found:
                 currency = input("\tSorry, but you cannot have multiple accounts of the same currency!\n\tPlease select other currencies or press ENTER to return\n\t\t").strip()
             else:
-                # currChecker = Client('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL', cache=None)
-                # responseStr = currChecker.service.CurrencyName(currency[:2].upper())
-                # if "not found" in responseStr.lower():
-                #     currency = input(
-                #         "\tSorry, but you have typed in an invalid currency!\n\tPlease select other currencies or type press ENTER to return\n\t\t")
-                #     continue
-                #check if the currency was typed in correctly
-                currCheckJson = {
-                    "currency" : currency
-                }
-                responseJSON = requests.post("https://92egg0rcuj.execute-api.eu-north-1.amazonaws.com/test/checkCurrency", json=currCheckJson).json()
-                responseBool = responseJSON["body"]
-                if not responseBool:
+                # check if the currency was typed in correctly
+                currChecker = Client('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL', cache=None)
+                responseStr = currChecker.service.CurrencyName(currency[:2].upper())
+                if "not found" in responseStr.lower():
                     currency = input(
                         "\tSorry, but you have typed in an invalid currency!\n\tPlease select other currencies or type press ENTER to return\n\t\t")
                     continue
+                # currCheckJson = {
+                #     "currency" : currency
+                # }
+                # responseJSON = requests.post("https://92egg0rcuj.execute-api.eu-north-1.amazonaws.com/test/checkCurrency", json=currCheckJson).json()
+                # responseBool = responseJSON["body"]
+                # if not responseBool:
+                #     currency = input(
+                #         "\tSorry, but you have typed in an invalid currency!\n\tPlease select other currencies or type press ENTER to return\n\t\t")
+                #     continue
                 #create the account  
                 requestJson = {
                     "call" : "postAccount",
@@ -105,7 +103,7 @@ def accountSelection():
     accounts_str = ""
     account_nr = 1
     for account in customer["accounts"]:
-        accounts_str += "Account #" + str(account_nr) + ": ID:  " + str(account["account_id"]) + " - " + str(account["current_sum"]) + " " + account["currency"] + "\n\t"
+        accounts_str += "Account #" + str(account_nr) + ": ID:  " + str(account["account_id"]) + " - " + str(round(account["current_sum"], 2)) + " " + account["currency"] + "\n\t"
         account_nr += 1
     keyboard_input = console(accountText.format(accounts=accounts_str), len(customer["accounts"]))
     #exception handling
@@ -162,14 +160,22 @@ def withdraw(transactionFlag = False):
                     input()
                     return
                 src_currency = customer["accounts"][accountIdx]["currency"]
-                dest_currrency = destCurrencyResponse["response"]["currency"]
+                dest_currency = destCurrencyResponse["response"]["currency"]
                 #calculate exchange rate
-                if src_currency == dest_currrency:
+                if src_currency == dest_currency:
                     exchangeRate = 1
                 else:
-                    curr = "%2C".join([src_currency, dest_currrency])
-                    exchangeRateResponse = requests.post(API_URL.format(api_key=API_KEY, curr=curr)).json()["rates"]
-                    exchangeRate = (1/exchangeRateResponse[src_currency]) * exchangeRateResponse[dest_currrency]
+                    currCheckJson = {
+                        "src_currency" : src_currency,
+                        "dest_currency" : dest_currency
+                    }
+                    responseJSON = requests.post("https://92egg0rcuj.execute-api.eu-north-1.amazonaws.com/test/checkCurrency", json=currCheckJson).json()
+                    exchangeRate = responseJSON["exchangeRate"]
+                    # curr = "%2C".join([src_currency, dest_currency])
+                    # exchangeRateResponse = requests.post(API_URL.format(api_key=API_KEY, curr=curr)).json()["rates"]
+                    # exchangeRate = (1/exchangeRateResponse[src_currency]) * exchangeRateResponse[dest_currrency]
+                    
+                    
                     print("\t\tThe exchange rate being used is the following: {rate}\n".format(rate=round(exchangeRate, 2)))
                 converted_sum = round(sum * exchangeRate, 2)
             else:
@@ -325,7 +331,7 @@ def mainMenu():
         account_nr = 1
         if customer["accounts"]:
             for account in customer["accounts"]:
-                account_str += "Account #" + str(account_nr) + ": ID:  " + str(account["account_id"]) + " - " + str(account["current_sum"]) + " " + account["currency"] + "\n\t"
+                account_str += "Account #" + str(account_nr) + ": ID:  " + str(account["account_id"]) + " - " + str(round(account["current_sum"], 2)) + " " + account["currency"] + "\n\t"
                 account_nr += 1
         else:
             account_str = "None"
