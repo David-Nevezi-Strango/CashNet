@@ -2,6 +2,7 @@ CXX := g++
 TARGET := server
 LIB_DIR := lib
 LIBS := $(wildcard $(LIB_DIR)/%.cpp)
+LIBS_HEADER := $(wildcard $(LIB_DIR)/%.h)
 
 CPPFLAGS := -03 -std=c++11 -lsqlite3 -lpthread
 
@@ -16,7 +17,7 @@ dependency:
 # make
 
 all: $(TARGET)
-$(TARGET): $(TARGET).cpp $(LIBS)
+$(TARGET): $(TARGET).cpp $(LIBS) $(LIBS_HEADER)
 	$(CXX) -o $@ $^ -I. -I$(LIB_DIR) $(CPPFLAGS)
 
 .PHONY: clean
