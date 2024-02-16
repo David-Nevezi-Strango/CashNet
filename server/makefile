@@ -1,14 +1,18 @@
+CXX := g++
+TARGET := server
+LIB_DIR := lib
+LIBS := $(wildcard $(LIB_DIR)/%.cpp)
+
+CPPFLAGS := -03 -std=c++11 -lsqlite3 -lpthread
+
 dependency:
 # apt-get install gcc
 	apt-get install g++
 	apt-get install sqlite3
 	apt-get install libsqlite3-dev
-	mkdir requests
 
 # ./lib/sqlite3/configure
 # cd lib/sqlite3/
 # make
-database:
-	g++ -o db/dbinit db/dbinit.cpp -std=c++11 -lsqlite3
-server: server.cpp addresses.h
-	g++ -o server server.cpp -std=c++11 -Ilib lib/transaction.cpp lib/customer.cpp lib/account.cpp  -lsqlite3 -lpthread
+$(TARGET): $(TARGET).cpp $(LIBS)
+	$(CXX) -o $@ $^ -I. -I$(LIB_DIR) $(CPPFLAGS)
