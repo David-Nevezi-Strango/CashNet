@@ -14,5 +14,11 @@ dependency:
 # ./lib/sqlite3/configure
 # cd lib/sqlite3/
 # make
+
+all: $(TARGET)
 $(TARGET): $(TARGET).cpp $(LIBS)
 	$(CXX) -o $@ $^ -I. -I$(LIB_DIR) $(CPPFLAGS)
+
+.PHONY: clean
+clean:
+	rm -f $(TARGET)
