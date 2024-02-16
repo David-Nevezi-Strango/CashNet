@@ -4,7 +4,7 @@ LIB_DIR := lib
 LIBS := $(wildcard $(LIB_DIR)/%.cpp)
 LIBS_HEADER := $(wildcard $(LIB_DIR)/%.h)
 
-CPPFLAGS := -03 -std=c++11 -lsqlite3 -lpthread
+CPPFLAGS := -O3 -std=c++11 -lsqlite3 -lpthread
 
 dependency:
 # apt-get install gcc
