@@ -3,6 +3,7 @@ TARGET := server
 LIB_DIR := lib
 LIBS := $(wildcard $(LIB_DIR)/%.cpp)
 LIBS_HEADER := $(wildcard $(LIB_DIR)/%.h)
+LIBS_HEADER += $(wildcard ./%.h)
 
 CPPFLAGS := -O3 -std=c++11 -lsqlite3 -lpthread
 
