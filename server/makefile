@@ -2,7 +2,9 @@ CXX := g++
 TARGET := server
 LIB_DIR := lib
 LIBS := $(wildcard $(LIB_DIR)/%.cpp)
-LIBS_HEADER := $(wildcard $(LIB_DIR)/%.h)
+OBJS := $(patsubst $(LIB_DIR)/%.cpp, %.o, $(LIB_DIR))
+LIBS_HEADER := $(wildcard $(LIB_DIR)/%.h) 
+# $(shell find $(LIB_DIR) -name "*.h" | awk "!/(Trash)|(build)/" | sort | uniq)
 LIBS_HEADER += $(wildcard ./%.h)
 
 CPPFLAGS := -O3 -std=c++11 -lsqlite3 -lpthread
@@ -18,9 +20,16 @@ dependency:
 # make
 
 all: $(TARGET)
-$(TARGET): $(TARGET).cpp $(LIBS) $(LIBS_HEADER)
+$(TARGET): $(TARGET).cpp $(OBJS) $(LIBS_HEADER)
+	@echo
+	$(CXX) --version
+	$(CXX) -o $@ $^ -I. -I$(LIB_DIR) $(CPPFLAGS)
+
+%.o: $(LIB_DIR)/%.cpp
+	@echo
+	$(CXX) --version
 	$(CXX) -o $@ $^ -I. -I$(LIB_DIR) $(CPPFLAGS)
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET)
+	-rm -f $(TARGET)
