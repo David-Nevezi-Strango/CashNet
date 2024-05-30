@@ -1,9 +1,9 @@
 CXX := g++
 TARGET := server
 LIB_DIR := lib
-LIBS := $(wildcard $(LIB_DIR)/%.cpp)
+LIBS := $(wildcard $(LIB_DIR)/*.cpp)
 OBJS := $(patsubst $(LIB_DIR)/%.cpp, %.o, $(LIB_DIR))
-LIBS_HEADER := $(wildcard $(LIB_DIR)/%.h) 
+LIBS_HEADER := $(wildcard $(LIB_DIR)/*.h) 
 # $(shell find $(LIB_DIR) -name "*.h" | awk "!/(Trash)|(build)/" | sort | uniq)
 LIBS_HEADER += $(wildcard ./%.h)
 
