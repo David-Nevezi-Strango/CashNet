@@ -15,6 +15,7 @@ dependency:
 	apt-get install g++
 	apt-get install sqlite3
 	apt-get install libsqlite3-dev
+	mkdir requests
 
 # ./lib/sqlite3/configure
 # cd lib/sqlite3/
