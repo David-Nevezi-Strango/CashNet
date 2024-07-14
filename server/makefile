@@ -1,6 +1,8 @@
 CXX := g++
 TARGET := server
 LIB_DIR := lib
+DB_DIR := db
+DB := dbinit
 LIBS := $(wildcard $(LIB_DIR)/*.cpp)
 OBJS := $(patsubst $(LIB_DIR)/%.cpp, %.o, $(LIBS))
 LIBS_HEADER := $(wildcard $(LIB_DIR)/*.h) 
@@ -19,6 +21,11 @@ dependency:
 # make
 
 all: $(TARGET)
+
+database: $(DB)
+$(DB): $(DB_DIR)/$(DB).cpp
+	$(CXX) -o $@ $^ $(CPPFLAGS) 
+
 $(TARGET): $(TARGET).o $(OBJS) $(LIBS_HEADER)
 	@echo
 	$(CXX) --version
