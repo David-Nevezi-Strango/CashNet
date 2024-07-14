@@ -1,5 +1,6 @@
 #ifndef QUEUE_H
 #define QUEUE_H
+#include <stdlib.h>
 /*
  * This is the main queue structure
  */
