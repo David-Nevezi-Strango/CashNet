@@ -18,11 +18,11 @@
 #include <fcntl.h>
 #include <sys/sendfile.h>
 #include <sys/stat.h>
-#include "lib/queue.h"
-#include "lib/nlohmann/json.hpp"
-#include "lib/customer.h"
-#include "lib/account.h"
-#include "lib/transaction.h"
+#include "queue.h"
+#include "nlohmann/json.hpp"
+#include "customer.h"
+#include "account.h"
+#include "transaction.h"
 #include "addresses.h"
 #include <vector>
 #include <sqlite3.h>
