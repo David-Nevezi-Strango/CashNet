@@ -13,3 +13,5 @@ server/requests/
 lambda.zip
 lambda/keys.py
 client/test.py
+*.o
+.gitignore.rej
