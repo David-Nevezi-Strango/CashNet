@@ -44,4 +44,4 @@ $(TARGET): $(TARGET).o $(OBJS) $(LIBS_HEADER)
 
 .PHONY: clean
 clean:
-	-rm -f $(TARGET)
+	-rm -f $(TARGET) *.o $(DB_DIR)/$(DB)
