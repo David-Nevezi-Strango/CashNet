@@ -24,7 +24,7 @@ all: $(TARGET)
 
 database: $(DB)
 $(DB): $(DB_DIR)/$(DB).cpp
-	$(CXX) -o $@ $^ $(CPPFLAGS) 
+	$(CXX) -o $(DB_DIR)/$@ $^ $(CPPFLAGS) 
 
 $(TARGET): $(TARGET).o $(OBJS) $(LIBS_HEADER)
 	@echo
