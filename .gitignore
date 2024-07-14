@@ -15,3 +15,4 @@ lambda/keys.py
 client/test.py
 *.o
 .gitignore.rej
+*.db
