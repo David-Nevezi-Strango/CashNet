@@ -516,6 +516,7 @@ void doProcessing (int connfd)
             if(adminConnected && ADMIN == pthread_self()){
                     pthread_mutex_lock(&admin_mutex);
                     ADMIN = 0;
+                    adminConnected = false;
                     pthread_mutex_unlock(&admin_mutex);
             }
 
